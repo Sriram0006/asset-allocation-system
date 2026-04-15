@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head><title>Asset System</title></head>
+<body>
+    <h1>Asset Allocation System</h1>
+    <div id="asset-list"></div>
+    <script>
+        fetch('/assets')
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('asset-list');
+                data.forEach(asset => {
+                    list.innerHTML += `<p>${asset.name}: $${asset.amount}</p>`;
+                });
+            });
+    </script>
+</body>
+</html>
