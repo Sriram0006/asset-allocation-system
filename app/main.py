@@ -1,4 +1,10 @@
 from flask import Flask, request, jsonify
+import sys
+import os
+
+# Adds the current directory to path so imports work inside Docker
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from models.asset_store import AssetManager
 
 app = Flask(__name__)
@@ -10,18 +16,15 @@ def view_assets():
 @app.route('/assets', methods=['POST'])
 def add_asset():
     data = request.get_json()
-    if not data or 'name' not in data or 'amount' not in data:
-        return jsonify({"error": "Missing name or amount"}), 400
-    
+    if not data: return jsonify({"error": "No data"}), 400
     new_asset = AssetManager.add_asset(data['name'], data['amount'])
     return jsonify(new_asset), 201
 
 @app.route('/assets/<int:asset_id>', methods=['DELETE'])
 def delete_asset(asset_id):
-    success = AssetManager.delete_asset(asset_id)
-    if success:
-        return jsonify({"message": f"Asset {asset_id} deleted"}), 200
-    return jsonify({"error": "Asset not found"}), 404
+    if AssetManager.delete_asset(asset_id):
+        return jsonify({"message": "Deleted"}), 200
+    return jsonify({"error": "Not found"}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
